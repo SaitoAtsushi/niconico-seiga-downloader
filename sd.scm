@@ -46,7 +46,7 @@
                   (car (assoc-ref header "location")))
       (error "Fail login. Please, check *mail* and *password*."))
     (slot-set! self 'user-session
-               (abstruct-cookie header #/user_session=user_session_[0-9_]+/))
+               (abstruct-cookie header #/user_session=user_session_[^;]+/))
     status))
 
 (define-method get-session ((self <nico>) (id <string>))
