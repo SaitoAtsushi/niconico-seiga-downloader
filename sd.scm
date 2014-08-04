@@ -6,10 +6,6 @@
 (define-constant *mail* "your e-mail address")
 (define-constant *password* "your password")
 
-(define-constant *fsencode*  ;; file-system encoding
-  (cond-expand (gauche.os.windows 'Shift_JIS)
-               (else 'utf8)))
-
 (use rfc.http)
 (use sxml.ssax)
 (use sxml.sxpath)
@@ -20,9 +16,6 @@
 (use gauche.sequence)
 (use gauche.charconv)
 (use gauche.uvector)
-
-(define fsencode
-  (cut ces-convert <> (gauche-character-encoding) *fsencode*))
 
 (define path-cleanup (cut regexp-replace-all #/[\\\/;:\t*?\"<>\|]/ <> "_"))
 
@@ -201,14 +194,14 @@
            (title (query-title info))
            (flag (if (string=? "0" (query-flag info)) #t #f))
            (za (open-output-zip-archive
-                (fsencode (path-cleanup #`"mg,|id| ,|title|.zip")))))
+                (path-cleanup #`"mg,|id| ,|title|.zip"))))
       (for-each-with-index
        (^(i x) (receive (status header body)
                    (http-get (car x) ((if flag path-convert values) (cdr x)))
                  (let1 body (if (string=? "drm.seiga.nicovideo.jp" (car x))
                                 (decrypt body (get-key-from-url (cdr x)))
                                 body)
-                   (zip-add-file za (format #f "~4,'0d.jpg" i)
+                   (zip-add-file za (format #f "~a-~4,'0d.jpg" id i)
                                  body :compression-level Z_NO_COMPRESSION))))
        lst)
       (zip-close za))))
