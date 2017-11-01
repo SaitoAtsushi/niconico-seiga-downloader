@@ -198,7 +198,7 @@
       (for-each-with-index
        (^(i x) (receive (status header body)
                    (http-get (car x) ((if flag path-convert values) (cdr x)))
-                 (let1 body (if (string=? "drm.seiga.nicovideo.jp" (car x))
+                 (let1 body (if (string=? "drm.nicoseiga.jp" (car x))
                                 (decrypt body (get-key-from-url (cdr x)))
                                 body)
                    (zip-add-file za (format #f "~a-~4,'0d.jpg" id i)
